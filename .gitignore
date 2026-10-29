@@ -10,3 +10,4 @@ broadcast/
 dist/
 *.log
 .DS_Store
+contracts/evm/lib/
