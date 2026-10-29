@@ -1,0 +1,21 @@
+{
+  "name": "sextant-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "whoami": "tsx whoami.ts"
+  },
+  "dependencies": {
+    "@polkadot/api": "^16.5.6",
+    "@polkadot/keyring": "^14.0.3",
+    "@polkadot/util": "^14.0.3",
+    "@polkadot/util-crypto": "^14.0.3",
+    "dotenv": "^16.6.1",
+    "viem": "^2.57.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
