@@ -4,7 +4,11 @@
 //!
 //! Solidity contracts on Portaldot V3 call it through pallet-revive like any
 //! other contract. It does the work that is awkward and expensive in Solidity:
-//! sorting, median, median absolute deviation (MAD) and time-weighted averages.
+//! sorting, stake-weighted median and median absolute deviation (MAD).
+
+// Decoding two uint128[16] arrays overflows PolkaVM's default stack and traps the call.
+#[cfg(not(feature = "std"))]
+ink::polkavm_derive::min_stack_size!(262144);
 
 #[ink::contract]
 mod sextant_math {
@@ -17,7 +21,6 @@ mod sextant_math {
     pub enum Error {
         Empty,
         TooMany,
-        LengthMismatch,
     }
 
     #[ink(storage)]
@@ -46,14 +49,6 @@ mod sextant_math {
             mad_k: u128,
         ) -> Result<(u128, u128, u128), Error> {
             aggregate(prices, weights, n as usize, outlier_bps, mad_k)
-        }
-
-        /// Time-weighted average of `prices[i]`, each valid from `times[i]`
-        /// until the next timestamp (or `now` for the last one).
-        #[ink(message)]
-        pub fn twap(&self, prices: [u128; N], times: [u64; N], n: u8, now: u64) -> Result<u128, Error> {
-            let n = (n as usize).min(N);
-            twap(&prices[..n], &times[..n], now)
         }
 
         #[ink(message)]
@@ -92,23 +87,6 @@ mod sextant_math {
             }
         }
         Ok((med, mad, mask))
-    }
-
-    pub fn twap(prices: &[u128], times: &[u64], now: u64) -> Result<u128, Error> {
-        if prices.is_empty() {
-            return Err(Error::Empty);
-        }
-        if prices.len() != times.len() {
-            return Err(Error::LengthMismatch);
-        }
-        let (mut acc, mut total) = (0u128, 0u128);
-        for i in 0..prices.len() {
-            let end = if i + 1 < times.len() { times[i + 1] } else { now };
-            let dt = end.saturating_sub(times[i]).max(1) as u128;
-            acc = acc.saturating_add(prices[i].saturating_mul(dt));
-            total += dt;
-        }
-        Ok(acc / total)
     }
 
     /// Lowest value whose cumulative weight reaches half the total. Insertion sort:
@@ -180,12 +158,6 @@ mod sextant_math {
         fn two_liars_in_five_are_flagged() {
             let (_, _, mask) = agg(&[1, 100_000, 100_100, 99_950, 500_000], &[1; 5]);
             assert_eq!(mask, 0b10001);
-        }
-
-        #[ink::test]
-        fn twap_weights_by_time() {
-            assert_eq!(twap(&[100, 200], &[0, 30], 40).unwrap(), (100 * 30 + 200 * 10) / 40);
-            assert_eq!(twap(&[1], &[1, 2], 3), Err(Error::LengthMismatch));
         }
     }
 }

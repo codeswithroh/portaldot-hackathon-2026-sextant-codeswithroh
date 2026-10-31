@@ -82,7 +82,7 @@ export function Landing() {
           <div className="stack" data-reveal>
             <div className="lcard"><span className="chip info">Solidity</span><h3>SextantCore</h3><p>Bonds, rounds, slashing</p></div>
             <span className="arrow">→</span>
-            <div className="lcard"><span className="chip bad">ink! / Rust</span><h3>SextantMath</h3><p>Weighted median, MAD, TWAP</p></div>
+            <div className="lcard"><span className="chip bad">ink! / Rust</span><h3>SextantMath</h3><p>Weighted median, MAD outliers</p></div>
             <span className="arrow">→</span>
             <div className="lcard"><span className="chip info">Solidity</span><h3>SextantFeed</h3><p>Chainlink interface</p></div>
           </div>

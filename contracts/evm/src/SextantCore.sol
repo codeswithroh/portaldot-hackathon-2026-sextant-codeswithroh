@@ -5,7 +5,7 @@ import {ISextantMath} from "./ISextantMath.sol";
 
 /// @title SextantCore
 /// @notice Bonded price reporters, rounds and slashing. The statistics (stake-weighted
-/// median, MAD outlier detection, TWAP) run in the ink! SextantMath contract.
+/// median, MAD outlier detection) run in the ink! SextantMath contract.
 ///
 /// A round closes once 2/3 of active stake has reported. If more than 1/3 of the
 /// round's stake disagrees with the median the round is contested: nothing is
@@ -283,19 +283,23 @@ contract SextantCore {
         return (roundId, int256(uint256(rd.answer)), rd.startedAt, rd.updatedAt, roundId);
     }
 
-    /// @notice Time-weighted average over the last `window` rounds (max 16), computed in ink!.
+    /// @notice Time-weighted average over the last `window` rounds (max 16).
     function twap(uint256 feedId, uint8 window) external view returns (uint128) {
         uint64 latest = _feed(feedId).latestRound;
         if (latest == 0) revert NoData();
         if (window == 0 || window > HISTORY) window = uint8(HISTORY);
         if (window > latest) window = uint8(latest);
-        uint128[16] memory prices;
-        uint64[16] memory times;
-        for (uint256 i; i < window; ++i) {
-            Round storage rd = rounds[feedId][latest - window + 1 + uint64(i)];
-            (prices[i], times[i]) = (rd.answer, rd.updatedAt);
+        uint256 acc;
+        uint256 total;
+        uint64 end = uint64(block.timestamp);
+        for (uint64 i; i < window; ++i) {
+            Round storage rd = rounds[feedId][latest - i];
+            uint256 dt = end > rd.updatedAt ? end - rd.updatedAt : 1;
+            acc += rd.answer * dt;
+            total += dt;
+            end = rd.updatedAt;
         }
-        return math.twap(prices, times, window, uint64(block.timestamp));
+        return uint128(acc / total);
     }
 
     /// @notice Stake an attacker must control to publish a false price: 4/9 of active stake.

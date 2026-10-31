@@ -25,22 +25,6 @@ contract MathRef is ISextantMath {
         }
     }
 
-    function twap(uint128[16] calldata prices, uint64[16] calldata times, uint8 n, uint64 nowTs)
-        external
-        pure
-        returns (uint128)
-    {
-        uint256 acc;
-        uint256 total;
-        for (uint256 i; i < n; ++i) {
-            uint64 end = i + 1 < n ? times[i + 1] : nowTs;
-            uint256 dt = end > times[i] ? end - times[i] : 1;
-            acc += uint256(prices[i]) * dt;
-            total += dt;
-        }
-        return uint128(acc / total);
-    }
-
     function version() external pure returns (uint32) {
         return 1;
     }

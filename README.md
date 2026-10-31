@@ -2,7 +2,7 @@
 
 A price oracle for Portaldot V3 that publishes what it would cost to corrupt it.
 
-Bonded reporters post prices from five independent exchanges. `SextantCore` (Solidity) holds bonds and rounds, and calls `SextantMath` (ink!, Rust) for a stake-weighted median, MAD outlier detection and TWAP. `SextantFeed` exposes the Chainlink `AggregatorV3Interface`, so existing Solidity code reads it unchanged.
+Bonded reporters post prices from five independent exchanges. `SextantCore` (Solidity) holds bonds and rounds, and calls `SextantMath` (ink!, Rust) for a stake-weighted median and MAD outlier detection. `SextantFeed` exposes the Chainlink `AggregatorV3Interface`, so existing Solidity code reads it unchanged.
 
 ## What happens when someone lies
 
@@ -44,7 +44,11 @@ cd ../app && pnpm install && pnpm dev
 
 ## Costs
 
-V3 charges about 0.08 tPOT per byte of deployed code. This is why reports use fixed-size `uint128[16]` arrays, which keeps the ink! contract allocation-free at 12 KB.
+V3 charges about 0.08 tPOT per byte of deployed code. This is why reports use fixed-size `uint128[16]` arrays, which keeps the ink! contract allocation-free at 10 KB. Each submit also needs about 24 tPOT available upfront (`scripts/topup.ts`), and a round costs a few tPOT in storage deposits.
+
+## Deployments
+
+`deployments.json` has the live addresses. `docs/deployments.v1.json` is the first deployment, abandoned because `aggregate` trapped: decoding two `uint128[16]` arrays overflowed PolkaVM's default stack. `min_stack_size!` in `contracts/math/lib.rs` fixes it.
 
 ## Known limits
 

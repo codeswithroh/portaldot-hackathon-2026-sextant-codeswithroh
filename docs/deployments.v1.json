@@ -1,0 +1,22 @@
+{
+  "SextantMath": {
+    "address": "0xacb6a797c9fa9880473d7b3202e335742d762338",
+    "tx": "0xe44bc0a0d96371280aab4da31068f00290619255e2e1adcfa0ed7576499b5bc1",
+    "block": 266723
+  },
+  "SextantCore": {
+    "address": "0x97db006bcf42bdd48a8705982a5a09bea403d7aa",
+    "tx": "0xa5313e155316e08a4863a78191cae060a7d722dea0fe03a93605db57ad9c920d",
+    "block": 266724
+  },
+  "SextantFeed": {
+    "address": "0xd925dbd94b884cb34b1c84d8ec0be7aa374b9ece",
+    "tx": "0x864e4591063bb6ef2864c2a4f3b5ecfc5615b37393372517371a6b7357688770",
+    "block": 266726
+  },
+  "MiniLend": {
+    "address": "0x4376185ce5a677c3232baf09934cff57cefff2c5",
+    "tx": "0x6a053205c9d6fcd882bde1c21fdb2fbc079c0f5ea240aab8c4f0d88c0adb6f88",
+    "block": 266727
+  }
+}

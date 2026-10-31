@@ -9,10 +9,5 @@ interface ISextantMath {
         view
         returns (uint128 median, uint128 mad, uint128 outlierMask);
 
-    function twap(uint128[16] calldata prices, uint64[16] calldata times, uint8 n, uint64 nowTs)
-        external
-        view
-        returns (uint128);
-
     function version() external view returns (uint32);
 }
