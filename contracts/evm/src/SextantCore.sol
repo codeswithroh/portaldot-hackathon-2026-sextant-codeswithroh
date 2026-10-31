@@ -4,8 +4,14 @@ pragma solidity ^0.8.28;
 import {ISextantMath} from "./ISextantMath.sol";
 
 /// @title SextantCore
-/// @notice Bonded price reporters, rounds and slashing. The statistics (median,
-/// MAD outlier detection, TWAP) run in the ink! SextantMath contract.
+/// @notice Bonded price reporters, rounds and slashing. The statistics (stake-weighted
+/// median, MAD outlier detection, TWAP) run in the ink! SextantMath contract.
+///
+/// A round closes once 2/3 of active stake has reported. If more than 1/3 of the
+/// round's stake disagrees with the median the round is contested: nothing is
+/// published and nobody is slashed, because the chain can't tell who is lying.
+/// So moving the price needs 2/3 of a round holding 2/3 of the stake: 4/9 of all
+/// active stake. `corruptionCost` publishes that number for consumers to act on.
 contract SextantCore {
     uint256 internal constant BPS = 10_000;
     uint8 public constant MAX_QUORUM = 16;
@@ -17,6 +23,7 @@ contract SextantCore {
         uint64 accepted;
         uint32 strikes;
         bool active;
+        uint64 unlockAt; // set by requestLeave; 0 while bonded
     }
 
     struct Feed {
@@ -43,16 +50,22 @@ contract SextantCore {
     uint128 public outlierBps;
     uint128 public madK; // tenths of a MAD
     uint128 public slashBps;
+    uint64 public unbondDelay;
+    uint128 public totalStake; // sum of active bonds
 
     mapping(address => Reporter) public reporters;
     address[] internal reporterList;
+    mapping(address => bool) internal seen;
     Feed[] internal feeds;
     mapping(uint256 => mapping(uint64 => Round)) internal rounds;
     mapping(uint256 => address[]) internal pendingWho;
     mapping(uint256 => uint128[]) internal pendingPrice;
 
     event ReporterJoined(address indexed reporter, uint128 bond);
+    event LeaveRequested(address indexed reporter, uint64 unlockAt);
     event ReporterLeft(address indexed reporter, uint128 refund);
+    event RoundContested(uint256 indexed feedId, uint64 roundId, uint128 median, uint128 flaggedStake, uint128 roundStake);
+    event GuardianSlashed(address indexed reporter, uint128 amount);
     event FeedCreated(uint256 indexed feedId, string description, uint8 decimals);
     event FeedFunded(uint256 indexed feedId, address indexed from, uint128 amount);
     event Submitted(uint256 indexed feedId, address indexed reporter, uint64 roundId, uint128 price);
@@ -77,14 +90,16 @@ contract SextantCore {
     error NoData();
     error BadParams();
     error TransferFailed();
+    error StillLocked();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
         _;
     }
 
-    constructor(ISextantMath math_, uint128 minBond_, uint8 quorum_, uint128 outlierBps_, uint128 madK_, uint128 slashBps_) {
+    constructor(ISextantMath math_, uint128 minBond_, uint8 quorum_, uint128 outlierBps_, uint128 madK_, uint128 slashBps_, uint64 unbondDelay_) {
         math = math_;
+        unbondDelay = unbondDelay_;
         owner = msg.sender;
         minBond = minBond_;
         _setParams(quorum_, outlierBps_, madK_, slashBps_);
@@ -121,21 +136,50 @@ contract SextantCore {
         if (r.active) revert AlreadyReporter();
         uint128 bond = r.bond + uint128(msg.value);
         if (bond < minBond) revert BondTooLow();
-        if (r.accepted == 0 && r.strikes == 0 && r.bond == 0) reporterList.push(msg.sender);
+        if (!seen[msg.sender]) {
+            seen[msg.sender] = true;
+            reporterList.push(msg.sender);
+        }
         r.bond = bond;
         r.active = true;
+        r.unlockAt = 0;
+        totalStake += bond;
         emit ReporterJoined(msg.sender, bond);
     }
 
-    /// @notice Withdraw remaining bond plus earned rewards.
-    function leave() external {
+    /// @notice Stop reporting. The bond stays slashable until the delay passes,
+    /// so a reporter can't lie and walk out in the same block.
+    function requestLeave() external {
         Reporter storage r = reporters[msg.sender];
-        if (!r.active && r.bond == 0 && r.earned == 0) revert NotReporter();
+        if (!r.active) revert NotReporter();
+        r.active = false;
+        r.unlockAt = uint64(block.timestamp) + unbondDelay;
+        totalStake -= r.bond;
+        emit LeaveRequested(msg.sender, r.unlockAt);
+    }
+
+    /// @notice Withdraw remaining bond plus earned rewards after the delay.
+    function withdraw() external {
+        Reporter storage r = reporters[msg.sender];
+        if (r.active || r.bond + r.earned == 0) revert NotReporter();
+        if (block.timestamp < r.unlockAt) revert StillLocked();
         uint128 refund = r.bond + r.earned;
-        (r.bond, r.earned, r.active) = (0, 0, false);
+        (r.bond, r.earned) = (0, 0);
         (bool ok,) = msg.sender.call{value: refund}("");
         if (!ok) revert TransferFailed();
         emit ReporterLeft(msg.sender, refund);
+    }
+
+    /// @notice Last resort when a majority-stake attack did get through: burn the
+    /// attackers' bonds into the feed pool. Owner-only in this version.
+    function guardianSlash(uint256 feedId, address reporter) external onlyOwner {
+        Reporter storage r = reporters[reporter];
+        Feed storage f = _feed(feedId);
+        uint128 amount = r.bond;
+        if (r.active) totalStake -= amount;
+        (r.bond, r.active) = (0, false);
+        f.pool += amount;
+        emit GuardianSlashed(reporter, amount);
     }
 
     /// @notice Report `price` for `roundId`, which must be `latestRound + 1`.
@@ -155,7 +199,9 @@ contract SextantCore {
         pendingPrice[feedId].push(price);
         emit Submitted(feedId, msg.sender, roundId, price);
 
-        if (who.length >= quorum) _finalize(feedId, f, roundId);
+        uint256 stake;
+        for (uint256 i; i < who.length; ++i) stake += reporters[who[i]].bond;
+        if (who.length >= quorum && stake * 3 >= uint256(totalStake) * 2) _finalize(feedId, f, roundId);
     }
 
     function _finalize(uint256 feedId, Feed storage f, uint64 roundId) internal {
@@ -164,10 +210,27 @@ contract SextantCore {
         uint8 n = uint8(who.length);
 
         uint128[16] memory prices;
-        for (uint256 i; i < n; ++i) prices[i] = px[i];
+        uint128[16] memory weights;
+        uint128 roundStake;
+        for (uint256 i; i < n; ++i) {
+            prices[i] = px[i];
+            weights[i] = reporters[who[i]].bond;
+            roundStake += weights[i];
+        }
 
         // Cross-VM call: EVM bytecode -> ink! (PolkaVM) on the same chain.
-        (uint128 median, uint128 mad, uint128 mask) = math.aggregate(prices, n, outlierBps, madK);
+        (uint128 median, uint128 mad, uint128 mask) = math.aggregate(prices, weights, n, outlierBps, madK);
+
+        uint128 flagged;
+        for (uint256 i; i < n; ++i) {
+            if (mask & (uint128(1) << i) != 0) flagged += weights[i];
+        }
+        if (uint256(flagged) * 3 > roundStake) {
+            delete pendingWho[feedId];
+            delete pendingPrice[feedId];
+            emit RoundContested(feedId, roundId, median, flagged, roundStake);
+            return;
+        }
 
         uint8 outliers;
         for (uint256 i; i < n; ++i) {
@@ -176,7 +239,11 @@ contract SextantCore {
                 uint128 amount = uint128(uint256(r.bond) * slashBps / BPS);
                 r.bond -= amount;
                 r.strikes += 1;
-                if (r.bond < minBond) r.active = false;
+                totalStake -= amount;
+                if (r.bond < minBond) {
+                    r.active = false;
+                    totalStake -= r.bond;
+                }
                 f.pool += amount;
                 ++outliers;
                 emit Slashed(feedId, who[i], roundId, prices[i], median, amount);
@@ -229,6 +296,11 @@ contract SextantCore {
             (prices[i], times[i]) = (rd.answer, rd.updatedAt);
         }
         return math.twap(prices, times, window, uint64(block.timestamp));
+    }
+
+    /// @notice Stake an attacker must control to publish a false price: 4/9 of active stake.
+    function corruptionCost() public view returns (uint128) {
+        return uint128(uint256(totalStake) * 4 / 9);
     }
 
     function feed(uint256 feedId) external view returns (Feed memory) {

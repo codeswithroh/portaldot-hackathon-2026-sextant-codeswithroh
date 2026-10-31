@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 /// @notice Solidity view of the ink! v6 SextantMath contract (contracts/math).
 /// Both run on pallet-revive, so this is an ordinary external call.
 interface ISextantMath {
-    function aggregate(uint128[16] calldata prices, uint8 n, uint128 outlierBps, uint128 madK)
+    function aggregate(uint128[16] calldata prices, uint128[16] calldata weights, uint8 n, uint128 outlierBps, uint128 madK)
         external
         view
         returns (uint128 median, uint128 mad, uint128 outlierMask);

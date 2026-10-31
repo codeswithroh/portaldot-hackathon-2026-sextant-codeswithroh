@@ -8,16 +8,15 @@ import {ISextantMath} from "../src/ISextantMath.sol";
 contract MathRef is ISextantMath {
     uint256 internal constant BPS = 10_000;
 
-    function aggregate(uint128[16] calldata prices, uint8 n, uint128 outlierBps, uint128 madK)
+    function aggregate(uint128[16] calldata prices, uint128[16] calldata weights, uint8 n, uint128 outlierBps, uint128 madK)
         external
         pure
         returns (uint128 med, uint128 mad, uint128 mask)
     {
-        uint128[16] memory s = prices;
-        med = _median(s, n);
+        med = _median(prices, weights, n);
         uint128[16] memory d;
         for (uint256 i; i < n; ++i) d[i] = _dist(prices[i], med);
-        mad = _median(d, n);
+        mad = _median(d, weights, n);
         for (uint256 i; i < n; ++i) {
             uint256 dist = _dist(prices[i], med);
             bool far = med == 0 || dist * BPS / med > outlierBps;
@@ -50,12 +49,20 @@ contract MathRef is ISextantMath {
         return a > b ? a - b : b - a;
     }
 
-    function _median(uint128[16] memory v, uint8 n) internal pure returns (uint128) {
+    function _median(uint128[16] memory v, uint128[16] memory w, uint8 n) internal pure returns (uint128) {
+        uint256 total;
+        for (uint256 i; i < n; ++i) total += w[i];
         for (uint256 i = 1; i < n; ++i) {
-            for (uint256 j = i; j > 0 && v[j - 1] > v[j]; --j) (v[j - 1], v[j]) = (v[j], v[j - 1]);
+            for (uint256 j = i; j > 0 && v[j - 1] > v[j]; --j) {
+                (v[j - 1], v[j]) = (v[j], v[j - 1]);
+                (w[j - 1], w[j]) = (w[j], w[j - 1]);
+            }
         }
-        if (n % 2 == 1) return v[n / 2];
-        (uint128 a, uint128 b) = (v[n / 2 - 1], v[n / 2]);
-        return a / 2 + b / 2 + (a % 2 + b % 2) / 2;
+        uint256 acc;
+        for (uint256 i; i < n; ++i) {
+            acc += w[i];
+            if (acc * 2 >= total) return v[i];
+        }
+        return v[n - 1];
     }
 }
