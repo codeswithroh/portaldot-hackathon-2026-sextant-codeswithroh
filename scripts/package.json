@@ -3,7 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "whoami": "tsx whoami.ts"
+    "whoami": "tsx whoami.ts",
+    "fund": "tsx fund-evm.ts",
+    "deploy": "tsx deploy.ts",
+    "setup": "tsx setup-reporters.ts",
+    "reporter": "tsx reporter.ts"
   },
   "dependencies": {
     "@polkadot/api": "^16.5.6",

@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { encodeDeployData, formatEther, parseEther, toHex, type Abi } from "viem";
 import { evmAccount, publicClient, walletClient } from "./lib.ts";
 
-// Deploys SextantMath (ink!), SextantCore and the BTC/USD SextantFeed through the Ethereum RPC.
+// Deploys SextantMath (ink!), SextantCore, the BTC/USD SextantFeed and MiniLend through the Ethereum RPC.
 const root = new URL("../", import.meta.url);
 const read = (p: string) => readFileSync(new URL(p, root));
 const wallet = walletClient();
@@ -28,7 +28,7 @@ const math = await deploy("SextantMath", toHex(read("contracts/math/target/ink/s
 const coreA = artifact("SextantCore");
 const core = await deploy(
   "SextantCore",
-  encodeDeployData({ ...coreA, args: [math, parseEther("10"), 5, 250n, 30n, 2_000n] }),
+  encodeDeployData({ ...coreA, args: [math, parseEther("10"), 3, 250n, 30n, 2_000n, 3600n] }),
 );
 
 const hash = await wallet.writeContract({
@@ -41,7 +41,10 @@ await publicClient.waitForTransactionReceipt({ hash });
 console.log("createFeed  ", hash);
 
 const feedA = artifact("SextantFeed");
-await deploy("SextantFeed", encodeDeployData({ ...feedA, args: [core, 0n] }));
+const feed = await deploy("SextantFeed", encodeDeployData({ ...feedA, args: [core, 0n] }));
+
+const lendA = artifact("MiniLend");
+await deploy("MiniLend", encodeDeployData({ ...lendA, args: [core, feed] }));
 
 const after = await publicClient.getBalance({ address: evmAccount().address });
 console.log("spent", formatEther(before - after), "tPOT, left", formatEther(after));
