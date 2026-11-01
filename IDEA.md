@@ -5,14 +5,14 @@
 ## Why this wins
 
 ### 1. It fills the biggest hole in the field
-I read all 57 submitted builds (2026-10-29). **None of them is an oracle**, but a lot of them need one:
+Rechecked against all 68 builds on 2026-11-01: **none is a general price oracle**. FairDot, Potake and Ballast each have a private oracle for their own data, and DotProof avoids prices by design. PASTX trades stocks at fixed prices. Plenty of them need one:
 lending (collateral checks), stablecoin and dollar payments, RWA invoice vaults, memecoin protection, DEX analytics.
 They all hardcode prices or rely on an admin. Sextant is the shared piece they're missing.
 
 ### 2. It makes Portaldot's headline V3 feature do real work
 The judging criteria call out WASM/EVM compatibility explicitly (Innovation, 30%).
 The live testnet runs `pallet-revive` (EVM RPC reports `eth-rpc/...`), so ink! v6 and Solidity contracts share one VM and one address space.
-**None of the 57 builds has an ink! contract and a Solidity contract calling each other.** The closest are address-mapping tools and monitors.
+Umbra has built an ink! proof verifier but lists deploying it as roadmap, so a live Solidity-to-ink! call inside a production transaction is still open.
 Sextant uses both VMs for what each is good at:
 - **ink! (Rust):** median/TWAP math, outlier detection, sr25519 signature checks, bond and slash accounting. This is heavy logic that is cheap and safe in Rust.
 - **Solidity:** a drop-in `AggregatorV3Interface` (Chainlink-compatible), so existing Aave- or Compound-style code ports to Portaldot without changes.
