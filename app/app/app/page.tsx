@@ -125,7 +125,7 @@ function Contracts() {
             {rows.map(([k, v]) => (
               <tr key={k}>
                 <td>{k}</td>
-                <td><span className={`chip ${k === "SextantMath" ? "bad" : "info"}`}>{k === "SextantMath" ? "ink! / PolkaVM" : "Solidity / EVM"}</span></td>
+                <td><span className={`chip ${k === "SextantMath" ? "bad" : "info"}`}>{k === "SextantMath" ? "ink! / Rust" : "Solidity"}</span></td>
                 <td className="mono">{v!.address}</td>
                 <td className="mono">{v!.tx.slice(0, 14)}</td>
               </tr>

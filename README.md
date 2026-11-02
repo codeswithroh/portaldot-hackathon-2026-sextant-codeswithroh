@@ -17,7 +17,7 @@ A round closes at 2/3 of active stake and freezes if over 1/3 of it is flagged. 
 ## Layout
 
 ```
-contracts/math   ink! v6 SextantMath, compiled to PolkaVM
+contracts/math   ink! v6 SextantMath
 contracts/evm    SextantCore, SextantFeed, MiniLend (Foundry)
 contracts/core   First all-ink! core, kept for reference and not deployed
 reporter         Exchange price sources
@@ -48,7 +48,7 @@ V3 charges about 0.08 tPOT per byte of deployed code. This is why reports use fi
 
 ## Deployments
 
-`deployments.json` has the live addresses. `docs/deployments.v1.json` is the first deployment, abandoned because `aggregate` trapped: decoding two `uint128[16]` arrays overflowed PolkaVM's default stack. `min_stack_size!` in `contracts/math/lib.rs` fixes it.
+`deployments.json` has the live addresses. `docs/deployments.v1.json` is the first deployment, abandoned because `aggregate` trapped: decoding two `uint128[16]` arrays overflowed the default contract stack. `min_stack_size!` in `contracts/math/lib.rs` fixes it.
 
 ## Known limits
 
