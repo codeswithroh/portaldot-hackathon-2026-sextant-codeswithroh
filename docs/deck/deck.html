@@ -1,0 +1,146 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sextant pitch deck</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#131c22;--bg:#f0f8ff;--card:#fff;--p:#2978ac;--a:#ab5a4b;--mut:#5a6873;--line:#d6e4ef;--ok:#2f7d4f;--warn:#a07a12}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:1920px 1080px;margin:0}
+body{font-family:"IBM Plex Sans",sans-serif;color:var(--ink);background:var(--bg)}
+.s{width:1920px;height:1080px;padding:110px 140px;position:relative;page-break-after:always;overflow:hidden;background:var(--bg)}
+.s.dark{background:var(--ink);color:#eef5fb}
+.k{font:500 22px "IBM Plex Mono",monospace;color:var(--p);letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px}
+.dark .k{color:#7fb6dc}
+h1{font-size:104px;line-height:1.02;font-weight:700;letter-spacing:-.02em;max-width:1300px}
+h2{font-size:68px;line-height:1.08;font-weight:700;letter-spacing:-.015em;max-width:1500px;margin-bottom:56px}
+p.lead{font-size:34px;line-height:1.4;color:var(--mut);max-width:1200px;margin-top:40px}
+.dark p.lead{color:#a9bccb}
+.foot{position:absolute;left:140px;bottom:60px;right:140px;display:flex;justify-content:space-between;font:400 20px "IBM Plex Mono",monospace;color:var(--mut)}
+.logo{display:flex;align-items:center;gap:18px;font-weight:600;font-size:34px}
+.grid{display:grid;gap:32px}
+.c3{grid-template-columns:repeat(3,1fr)}.c2{grid-template-columns:1fr 1fr}.c4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border-radius:24px;padding:44px;box-shadow:0 2px 0 var(--line),0 12px 40px rgba(19,28,34,.06)}
+.big{font-size:88px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.lbl{font-size:26px;color:var(--mut);margin-top:16px;line-height:1.35}
+.card h3{font-size:36px;margin:22px 0 14px}
+.card p{font-size:26px;line-height:1.4;color:var(--mut)}
+.chip{display:inline-block;font:500 20px "IBM Plex Mono",monospace;padding:8px 16px;border-radius:999px}
+.ok{background:#dcefe3;color:var(--ok)}.warn{background:#f6ecd0;color:var(--warn)}.bad{background:#f3dfda;color:var(--a)}.blue{background:#dbeaf5;color:var(--p)}
+.dots{display:flex;gap:10px;margin-top:22px}.dot{width:26px;height:26px;border-radius:50%;background:var(--p)}.dot.r{background:var(--a)}
+.flow{display:flex;align-items:stretch;gap:0}
+.node{flex:1;background:var(--card);border-radius:22px;padding:34px 30px;box-shadow:0 2px 0 var(--line)}
+.node .t{font:500 18px "IBM Plex Mono",monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.node .n{font-size:32px;font-weight:600;margin:12px 0}
+.node p{font-size:22px;color:var(--mut);line-height:1.4}
+.node.rust{border-top:8px solid var(--a)}.node.sol{border-top:8px solid var(--p)}.node.off{border-top:8px solid #9fb3c2}
+.arr{width:56px;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--mut)}
+code,.mono{font-family:"IBM Plex Mono",monospace}
+table{width:100%;border-collapse:collapse;font-size:28px}
+td{padding:26px 10px;border-bottom:2px solid var(--line);vertical-align:top}
+td.m{font-family:"IBM Plex Mono",monospace;font-size:22px;color:var(--mut);word-break:break-all}
+ul.plain{list-style:none;font-size:30px;line-height:1.5}
+ul.plain li{padding:14px 0;border-bottom:2px solid var(--line)}
+.dark ul.plain li{border-color:#2a3843}
+</style></head><body>
+
+<!-- 1 -->
+<section class="s">
+  <div class="logo"><svg width="64" height="64" viewBox="0 0 32 32"><path d="M16 3 L4 25 A24 24 0 0 0 28 25 Z" fill="#2978ac"/><path d="M16 3 L20.5 28" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="3.5" r="3" fill="#ab5a4b"/></svg>Sextant</div>
+  <h1 style="margin-top:150px">A price feed that tells you what it costs to corrupt it.</h1>
+  <p class="lead">An oracle for Portaldot. Bonded reporters, a Rust median that slashes liars, and a Chainlink-compatible feed any Solidity app can read.</p>
+  <div class="foot"><span>Portaldot Hacker House 2026 · Modular Cloud &amp; Middleware</span><span>github.com/codeswithroh/portaldot-hackathon-2026-sextant-codeswithroh</span></div>
+</section>
+
+<!-- 2 -->
+<section class="s">
+  <div class="k">The problem</div>
+  <h2>Every DeFi app on Portaldot needs prices. None of them can get one they can trust.</h2>
+  <div class="grid c3">
+    <div class="card"><div class="big">0</div><div class="lbl">general price oracles among the 68 builds in this hackathon</div></div>
+    <div class="card"><div class="big">Hardcoded</div><div class="lbl">how lending, stablecoin and RWA builds get prices today, or an admin key sets them</div></div>
+    <div class="card"><div class="big">Unknown</div><div class="lbl">how much an attacker must spend to fake a price, so nobody can size their risk</div></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="s">
+  <div class="k">How it works</div>
+  <h2>One transaction crosses both of Portaldot's VMs.</h2>
+  <div class="flow">
+    <div class="node off"><div class="t">Off-chain</div><div class="n">Reporters</div><p>Bond tPOT. Post BTC/USD from Coinbase, Kraken, Bitstamp, Gemini, Bitfinex.</p></div>
+    <div class="arr">→</div>
+    <div class="node sol"><div class="t">Solidity</div><div class="n">SextantCore</div><p>Rounds close at 2/3 of stake. Slashes, pays rewards, holds bonds.</p></div>
+    <div class="arr">⇄</div>
+    <div class="node rust"><div class="t">ink! · Rust</div><div class="n">SextantMath</div><p>Stake-weighted median, MAD, outlier mask.</p></div>
+    <div class="arr">→</div>
+    <div class="node sol"><div class="t">Solidity</div><div class="n">SextantFeed</div><p>Chainlink <code>AggregatorV3Interface</code>. Existing code reads it unchanged.</p></div>
+    <div class="arr">→</div>
+    <div class="node sol"><div class="t">Consumer</div><div class="n">MiniLend</div><p>Caps total debt at <code>corruptionCost()</code>. Rejects prices older than 15 min.</p></div>
+  </div>
+  <p class="lead" style="font-size:28px">Rust does the maths, Solidity holds the money and speaks the interface every DeFi developer already knows.</p>
+</section>
+
+<!-- 4 -->
+<section class="s">
+  <div class="k">What an attacker gets</div>
+  <h2>Three outcomes, all enforced on-chain.</h2>
+  <div class="grid c3">
+    <div class="card"><span class="chip ok">1 of 5 lies</span><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot r"></div></div><h3>Price holds</h3><p>The median ignores the liar. The liar loses 20% of their bond. Honest reporters get paid.</p></div>
+    <div class="card"><span class="chip warn">2 of 5 collude</span><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot r"></div><div class="dot r"></div></div><h3>Feed freezes</h3><p>Over 1/3 of the round disagrees. Nothing is published and no honest reporter is slashed.</p></div>
+    <div class="card"><span class="chip bad">4/9 of stake</span><div class="dots"><div class="dot r"></div><div class="dot r"></div><div class="dot r"></div><div class="dot r"></div><div class="dot"></div></div><h3>That's the price</h3><p>This much bonded capital can force a false price. The contract publishes the number as <code>corruptionCost()</code>.</p></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="s dark">
+  <div class="k">Why Portaldot</div>
+  <h2>This design needs both VMs. Portaldot V3 is where they share one transaction.</h2>
+  <ul class="plain" style="max-width:1500px">
+    <li><b>ink! for the maths.</b> Sorting and weighted medians over 16 reporters are cheap and memory-safe in Rust, at 10.4 KB of contract code.</li>
+    <li><b>Solidity for compatibility.</b> Aave- or Compound-style code ports with zero oracle changes.</li>
+    <li><b>POT is the security budget.</b> Every feed's safety is denominated in bonded POT, so feeds that matter create staking demand.</li>
+    <li><b>It unblocks the ecosystem.</b> Lending, stablecoin, RWA and DEX builds here all need a price they can defend.</li>
+  </ul>
+</section>
+
+<!-- 6 -->
+<section class="s">
+  <div class="k">Proof it works</div>
+  <h2>Live on PortaldotV3 testnet.</h2>
+  <table>
+    <tr><td style="width:420px"><b>SextantMath</b> <span class="chip blue">ink!</span></td><td class="m">0x5bc4f7bed4064425c0115dd190628dec5f8f6865<br>tx 0x82908ae49d21df90e0c9711532c5cce2a2349bd5e6ef4a5cf07912e8c92b5b2c</td></tr>
+    <tr><td><b>Cross-VM call</b></td><td>Solidity ABI → ink! returned median 77,555.00, MAD 5.00 and mask <code>0b10</code>: the one fake price, flagged.</td></tr>
+    <tr><td><b>Full stack v1</b></td><td>Core, Feed and MiniLend deployed at blocks 266,724–266,727. Reporters joined and bonded. This run exposed a PolkaVM stack overflow, which is now fixed and redeployed.</td></tr>
+    <tr><td><b>Tests</b></td><td>9 Forge tests (liar, collusion, whale, unbonding, lending cap, TWAP) and 5 ink! unit tests, all passing.</td></tr>
+    <tr><td><b>Dashboard</b></td><td>Live chain view, reporter bonds, slash log, and an Attack Lab with 5 scenarios.</td></tr>
+  </table>
+</section>
+
+<!-- 7 -->
+<section class="s">
+  <div class="k">Business model</div>
+  <h2>Apps pay per feed. Reporters earn for staking honestly.</h2>
+  <div class="grid c3">
+    <div class="card"><h3 style="margin-top:0">Feed fees</h3><p>Each feed is funded in POT by the apps that read it, and every honest report is paid from that pool.</p></div>
+    <div class="card"><h3 style="margin-top:0">Priced security</h3><p>An app that needs more safety funds more stake. Its <code>corruptionCost()</code> rises, and its lending cap rises with it.</p></div>
+    <div class="card"><h3 style="margin-top:0">Premium feeds</h3><p>FX, commodities and RWA attestations such as invoice or assay data, served through the same interface.</p></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="s dark">
+  <div class="k">Next</div>
+  <h2>Roadmap</h2>
+  <div class="grid c2" style="gap:60px">
+    <ul class="plain">
+      <li><span class="chip blue">Nov</span>&nbsp; Live rounds on V3 with slash and freeze demos</li>
+      <li><span class="chip blue">Dec</span>&nbsp; Native "5…" reporter accounts, permissionless joining</li>
+      <li><span class="chip blue">Q1</span>&nbsp; ETH, DOT and POT feeds, plus the first partner integration</li>
+      <li><span class="chip blue">Q2</span>&nbsp; Audit, then mainnet with an independent reporter set</li>
+    </ul>
+    <div>
+      <p class="lead" style="margin-top:0;color:#eef5fb;font-size:40px;line-height:1.35">Every lending, stablecoin and RWA app on Portaldot needs this piece. Sextant is that piece, and it says out loud how safe it is.</p>
+      <p class="lead mono" style="font-size:24px">github.com/codeswithroh/portaldot-hackathon-2026-sextant-codeswithroh</p>
+    </div>
+  </div>
+</section>
+</body></html>
