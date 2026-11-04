@@ -107,11 +107,11 @@ ul.plain li{padding:14px 0;border-bottom:2px solid var(--line)}
   <div class="k">Proof it works</div>
   <h2>Live on PortaldotV3 testnet.</h2>
   <table>
-    <tr><td style="width:420px"><b>SextantMath</b> <span class="chip blue">ink!</span></td><td class="m">0x5bc4f7bed4064425c0115dd190628dec5f8f6865<br>tx 0x82908ae49d21df90e0c9711532c5cce2a2349bd5e6ef4a5cf07912e8c92b5b2c</td></tr>
-    <tr><td><b>Cross-VM call</b></td><td>Solidity ABI → ink! returned median 77,555.00, MAD 5.00 and mask <code>0b10</code>: the one fake price, flagged.</td></tr>
-    <tr><td><b>Full stack v1</b></td><td>Core, Feed and MiniLend deployed at blocks 266,724–266,727. Reporters joined and bonded. This run exposed a PolkaVM stack overflow, which is now fixed and redeployed.</td></tr>
-    <tr><td><b>Tests</b></td><td>9 Forge tests (liar, collusion, whale, unbonding, lending cap, TWAP) and 5 ink! unit tests, all passing.</td></tr>
-    <tr><td><b>Dashboard</b></td><td>Live chain view, reporter bonds, slash log, and an Attack Lab with 5 scenarios.</td></tr>
+    <tr><td style="width:420px"><b>Contracts</b> <span class="chip blue">ink! + Solidity</span></td><td class="m">Math 0x5bc4…6865 · Core 0xea02…b613<br>Feed 0x0723…176b · MiniLend 0x16bd…dcd1d</td></tr>
+    <tr><td><b>Round 2: one liar</b></td><td>One reporter posts $117,507. Price holds at $78,343.83, liar fined 4 tPOT. <span class="m">tx 0x8e6d…456c</span></td></tr>
+    <tr><td><b>Round 3: two collude</b></td><td>36 of 76 tPOT flagged. Round frozen, nothing published, nobody fined. <span class="m">tx 0x7140…1c17</span></td></tr>
+    <tr><td><b>Lending</b></td><td>MiniLend lent 10 tPOT against the live BTC price. Cap: 42.7 tPOT, the cost to corrupt.</td></tr>
+    <tr><td><b>Try it</b></td><td class="m">sextant-oracle.vercel.app</td></tr>
   </table>
 </section>
 
@@ -132,7 +132,7 @@ ul.plain li{padding:14px 0;border-bottom:2px solid var(--line)}
   <h2>Roadmap</h2>
   <div class="grid c2" style="gap:60px">
     <ul class="plain">
-      <li><span class="chip blue">Nov</span>&nbsp; Live rounds on V3 with slash and freeze demos</li>
+      <li><span class="chip blue">Nov</span>&nbsp; Done: live rounds on V3, slash, freeze and a capped loan</li>
       <li><span class="chip blue">Dec</span>&nbsp; Native "5…" reporter accounts, permissionless joining</li>
       <li><span class="chip blue">Q1</span>&nbsp; ETH, DOT and POT feeds, plus the first partner integration</li>
       <li><span class="chip blue">Q2</span>&nbsp; Audit, then mainnet with an independent reporter set</li>

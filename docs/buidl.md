@@ -12,7 +12,7 @@
 
 **Team Info:** Rohit Purkait (solo). Contracts, reporter node, dashboard.
 
-**Project URL (globe field):** https://github.com/codeswithroh/portaldot-hackathon-2026-sextant-codeswithroh
+**Project URL (globe field):** https://sextant-oracle.vercel.app
 
 **+ GitHub Repo:** https://github.com/codeswithroh/portaldot-hackathon-2026-sextant-codeswithroh
 
@@ -50,19 +50,20 @@ Lending, stablecoins and RWA apps on Portaldot all need prices. Today each team 
 6. **MiniLend**, the demo consumer, caps total debt at `corruptionCost()` and rejects prices older than 15 minutes. An attack never costs less than what it could steal.
 
 ### Demo scene
-Five reporters post live BTC prices. Reporter 2 starts lying by +40%: the feed doesn't move, the liar gets slashed on-chain, and the honest reporters get paid. Then two reporters collude: the round freezes instead of publishing a bad price. The dashboard's Attack Lab lets anyone try each attack and see the outcome before it runs on-chain.
+Five reporters post live BTC prices. Reporter 2 starts lying by +50%: the feed doesn't move, the liar gets slashed on-chain, and the honest reporters get paid. Then two reporters collude: the round freezes instead of publishing a bad price. The dashboard's Attack Lab lets anyone try each attack and see the outcome before it runs on-chain.
 
 ### Technical highlights
 - **Both of Portaldot's VMs in one transaction:** a Solidity contract calls an ink! v6 contract through the Solidity ABI, both running on the V3 runtime.
-- **Live on V3 testnet:** SextantMath at `0x5bc4f7bed4064425c0115dd190628dec5f8f6865`, deploy tx `0x82908ae49d21df90e0c9711532c5cce2a2349bd5e6ef4a5cf07912e8c92b5b2c`. Called on-chain, it returned the median and flagged the fake price.
+- **Live on V3 testnet:** all four contracts are deployed (addresses in the README). Round 2 slashed a reporter who posted $117,507 while the price held at $78,343.83 (tx `0x8e6d12c0628b146923e4cbff0ea068ab0e6fd9bd763f9bb4aed05b389435456c`). A two-reporter collusion froze round 3 (tx `0x7140b1e5fd7e6a3ec3838d2d511b063f01b4542a747d0425e09a10b761fb9c17`). MiniLend lent 10 tPOT against the live price.
 - **Found and fixed a PolkaVM stack overflow:** decoding two `[u128;16]` arrays trapped the contract. The fix is `min_stack_size!(262144)`, documented in the README.
 - **Small contracts, measured costs:** the ink! blob is 10.4 KB and SextantCore is 8.6 KB. Per-byte storage deposits are measured and listed in the README.
 - **Tests:** 9 Forge tests (liar, collusion, whale, unbonding, lending cap, TWAP) and 5 ink! unit tests.
 - **Stack:** ink! v6, Solidity 0.8.28 (Foundry), TypeScript reporter (viem, polkadot.js), Next.js dashboard.
 
 ### Status
-- **Deployed:** SextantMath (ink!).
-- **Waiting for testnet tPOT:** Core, Feed and MiniLend. Full contract addresses and round tx hashes will be in the README.
+- **Deployed on PortaldotV3:** SextantMath (ink!), SextantCore, SextantFeed, MiniLend.
+- **Live:** 6 published rounds, 1 liar slashed, 1 collusion frozen, 1 loan open.
+- **Dashboard:** https://sextant-oracle.vercel.app
 
 ### Declaration
 I confirm that:

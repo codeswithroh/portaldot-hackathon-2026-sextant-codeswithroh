@@ -10,7 +10,17 @@ export const sources: Source[] = [
 ];
 
 /** BTC/USD with 8 decimals. */
-export async function fetchPrice(s: Source): Promise<bigint> {
+export async function fetchPrice(s: Source, tries = 3): Promise<bigint> {
+  try {
+    return await fetchOnce(s);
+  } catch (e) {
+    if (tries <= 1) throw e;
+    await new Promise((r) => setTimeout(r, 1500));
+    return fetchPrice(s, tries - 1);
+  }
+}
+
+async function fetchOnce(s: Source): Promise<bigint> {
   const res = await fetch(s.url, { signal: AbortSignal.timeout(8_000), headers: { "user-agent": "sextant-reporter" } });
   if (!res.ok) throw new Error(`${s.name} ${res.status}`);
   const n = Number(s.pick(await res.json()));

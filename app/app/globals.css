@@ -97,8 +97,8 @@ button, input { font: inherit; }
 .tl-ic.good { background: var(--good-soft); color: var(--good); } .tl-ic.bad { background: var(--accent-soft); color: var(--accent); }
 .tl-ic.warn { background: var(--warn-soft); color: var(--warn); } .tl-ic.info { background: var(--bg); color: var(--primary); }
 
-.anatomy .track { position: relative; height: 110px; margin: 8px 4px 0; }
-.anatomy .track::before { content: ""; position: absolute; left: 0; right: 0; top: 54px; height: 2px; background: var(--surface); }
+.anatomy .track { position: relative; height: 150px; margin: 8px 4px 0; }
+.anatomy .track::before { content: ""; position: absolute; left: 0; right: 0; top: 71px; height: 2px; background: var(--surface); }
 .median { position: absolute; top: 6px; bottom: 0; width: 2px; background: var(--text); transform: translateX(-1px); transition: left .3s ease-out; }
 .median span { position: absolute; top: -4px; left: 8px; font: 600 11px var(--mono); background: var(--text); color: #fff; padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
 .pin { position: absolute; width: 28px; height: 28px; border-radius: 50%; transform: translate(-50%, 0); display: grid; place-items: center; color: #fff; font-size: 10.5px; font-weight: 700; box-shadow: 0 0 0 3px #fff; transition: left .3s ease-out; }

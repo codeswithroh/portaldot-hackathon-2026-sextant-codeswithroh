@@ -89,6 +89,19 @@ function Timeline({ items, limit = 9 }: { items: Activity[]; limit?: number }) {
 }
 
 /** Each reporter's last report in a round against the published median. */
+/** Give each pin a lane (0, -1, 1, -2, 2…) so pins with close prices stack instead of overlapping. */
+function swarm(xs: number[], gap = 9) {
+  const lanes = new Array<number>(xs.length);
+  const taken: { x: number; lane: number }[] = [];
+  xs.map((x, i) => ({ x, i })).sort((a, b) => a.x - b.x).forEach(({ x, i }) => {
+    for (let k = 0; ; k++) {
+      const lane = k % 2 ? -Math.ceil(k / 2) : k / 2;
+      if (!taken.some((t) => t.lane === lane && Math.abs(t.x - x) < gap)) { lanes[i] = lane; taken.push({ x, lane }); break; }
+    }
+  });
+  return lanes;
+}
+
 function RoundAnatomy({ s, round }: { s: Live; round?: number }) {
   const r = round ?? s.rounds.at(-1)?.round;
   const pub = s.rounds.filter((x) => x.round === r).at(-1);
@@ -105,10 +118,11 @@ function RoundAnatomy({ s, round }: { s: Live; round?: number }) {
     <div className="anatomy">
       <div className="track">
         <div className="median" style={{ left: `${x(pub.price)}%` }}><span>{usd(pub.price)}</span></div>
-        {subs.map((v, i) => {
+        {swarm(subs.map((v) => x(v.price))).map((lane, i) => {
+          const v = subs[i];
           const who = rep.get(v.reporter.toLowerCase());
           const far = Math.abs(v.price - pub.price) / pub.price > 0.025;
-          return <div key={i} className={`pin${far ? " far" : ""}`} title={`${who?.name}: ${usd(v.price, 2)}`} style={{ left: `${x(v.price)}%`, background: far ? "var(--accent)" : who?.color, top: 30 + (i % 3) * 16 }}>{who?.name.slice(0, 2)}</div>;
+          return <div key={i} className={`pin${far ? " far" : ""}`} title={`${who?.name}: ${usd(v.price, 2)}`} style={{ left: `${x(v.price)}%`, background: far ? "var(--accent)" : who?.color, top: 58 + lane * 32 }}>{who?.name.slice(0, 2)}</div>;
         })}
       </div>
       <div className="legend"><span><i style={{ background: "var(--text)" }} />Median</span><span><i style={{ background: "var(--accent)" }} />Over 2.5% off</span><span className="mono">Round {r}</span></div>

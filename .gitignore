@@ -14,3 +14,4 @@ contracts/evm/lib/
 app/.next/
 next-env.d.ts
 .claude/
+.vercel

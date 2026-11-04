@@ -13,6 +13,18 @@ const liars = new Set((arg("lie", "") as string).split(",").filter(Boolean).map(
 const liePct = BigInt(arg("lie-pct", "50")!);
 const core = !flag("dry-run") ? deployments.SextantCore.address : undefined;
 
+// The testnet RPC drops a request now and then. Retry transport errors, not contract reverts.
+async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
+  try {
+    return await fn();
+  } catch (e: any) {
+    const transport = /HTTP request failed|RPC Request failed|fetch failed|timeout/i.test(e.shortMessage ?? e.message);
+    if (!transport || tries <= 1) throw e;
+    await new Promise((r) => setTimeout(r, 2000));
+    return withRetry(fn, tries - 1);
+  }
+}
+
 async function tick() {
   const latest = core
     ? ((await publicClient.readContract({ address: core, abi: coreAbi, functionName: "feed", args: [0n] })) as any).latestRound
@@ -33,12 +45,12 @@ async function tick() {
       continue;
     }
     try {
-      const hash = await walletClient(i + 1).writeContract({
+      const hash = await withRetry(() => walletClient(i + 1).writeContract({
         address: core,
         abi: coreAbi,
         functionName: "submit",
         args: [0n, round, price],
-      });
+      }));
       await publicClient.waitForTransactionReceipt({ hash });
       console.log(`  r${i + 1} ${evmAccount(i + 1).address.slice(0, 8)} ${sources[i].name.padEnd(9)} ${shown}${lying ? "  LIE" : ""} ${hash}`);
     } catch (e: any) {
