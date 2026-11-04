@@ -3,5 +3,20 @@
     "address": "0x5bc4f7bed4064425c0115dd190628dec5f8f6865",
     "tx": "0x82908ae49d21df90e0c9711532c5cce2a2349bd5e6ef4a5cf07912e8c92b5b2c",
     "block": 266812
+  },
+  "SextantCore": {
+    "address": "0xea02adc5b3cf54447196eee48e5bb7028a9fb613",
+    "tx": "0xfa660262b05a6551c4049304bf7969b5d63d1590e0b1d11624467451da0dbfac",
+    "block": 318064
+  },
+  "SextantFeed": {
+    "address": "0x0723c3a291866cb0acfa7b9218613476f02f176b",
+    "tx": "0x0961f58a9d0f43608c83b3657b4a1ddbcc6174d532d6dd0811f51e8e56770e39",
+    "block": 318066
+  },
+  "MiniLend": {
+    "address": "0x16bde054fd6ff12bf705d43d3aac495cae0dcd1d",
+    "tx": "0xac5e673500baa895006de24094bfa9bc8b5278124249606b661b5fd55b9262dc",
+    "block": 318067
   }
 }
