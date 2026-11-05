@@ -16,7 +16,7 @@
 
 **+ GitHub Repo:** https://github.com/codeswithroh/portaldot-hackathon-2026-sextant-codeswithroh
 
-**+ Video:** required by the form. Add the YouTube/Loom link once the demo is recorded.
+**+ Video:** https://youtu.be/ix8gFLvdfJw
 
 **+ X / LinkedIn:** your own profiles (optional)
 
@@ -64,6 +64,7 @@ Five reporters post live BTC prices. Reporter 2 starts lying by +50%: the feed d
 - **Deployed on PortaldotV3:** SextantMath (ink!), SextantCore, SextantFeed, MiniLend.
 - **Live:** 6 published rounds, 1 liar slashed, 1 collusion frozen, 1 loan open.
 - **Dashboard:** https://sextant-oracle.vercel.app
+- **Demo video:** https://youtu.be/ix8gFLvdfJw
 
 ### Declaration
 I confirm that:

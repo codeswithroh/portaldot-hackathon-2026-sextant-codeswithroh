@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://sextant-oracle.vercel.app"><b>Live app</b></a> ·
   <a href="https://sextant-oracle.vercel.app/app">Dashboard</a> ·
+  <a href="https://youtu.be/ix8gFLvdfJw">Demo video</a> ·
   <a href="docs/pitch-deck.pdf">Pitch deck</a> ·
   <a href="#live-rounds">On-chain proof</a>
 </p>
